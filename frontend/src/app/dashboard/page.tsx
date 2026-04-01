@@ -6,6 +6,7 @@ import Note from "@/models/Note";
 import Task from "@/models/Task";
 import QuizHistory from "@/models/QuizHistory";
 import StudySession, { IStudySession } from "@/models/StudySession";
+import User from "@/models/User";
 import {
   Card,
   CardContent,
@@ -23,7 +24,8 @@ import {
   Trophy,
   ArrowUpRight,
   TrendingUp,
-  ExternalLink
+  ExternalLink,
+  Settings as SettingsIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -93,21 +95,30 @@ export default async function DashboardPage() {
     { name: "Study Hours", value: `${totalHours}h`, icon: Clock, color: "text-indigo-600", bg: "bg-indigo-50", trend: "This week" },
   ];
 
+  const user = await User.findById(userId).select("name settings");
+  const userName = user?.name || session.user.name || "Student";
+
   return (
     <DashboardAnimationWrapper>
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-4">
-            <h1 className="text-4xl font-black tracking-tight text-slate-900">
-              Hi, {session.user?.name?.split(' ')[0]}
-            </h1>
-            {/* <SeedDataButton /> */}
+            <div>
+              <h1 className="text-4xl font-black tracking-tight text-slate-900">
+                Welcome back, {userName}! 👋
+              </h1>
+              <p className="text-slate-500 mt-2 font-medium">
+                You've studied for <span className="text-indigo-600 font-bold">{totalHours} hours</span> this week. Keep it up!
+              </p>
+            </div>
           </div>
-          <p className="text-slate-500 mt-2 font-medium">
-            You have {upcomingTasks.length} pending tasks to crush today.
-          </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <Link href="/dashboard/settings">
+            <Button variant="outline" className="rounded-xl border-slate-200 hover:bg-slate-50 font-bold text-slate-600">
+              <SettingsIcon className="w-4 h-4 mr-2" /> Settings
+            </Button>
+          </Link>
           <Link href="/dashboard/subjects">
             <Button className="rounded-xl shadow-lg shadow-indigo-100 bg-indigo-600 hover:bg-indigo-700 font-bold text-white h-12 px-6">
               <PlusCircle className="mr-2 h-5 w-5" /> Start Studying
@@ -156,7 +167,7 @@ export default async function DashboardPage() {
                 <div className="text-center py-20 bg-slate-50/50 rounded-[2rem] border-2 border-dashed border-slate-100">
                   <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No subjects created yet.</p>
                   <Link href="/dashboard/subjects">
-                    <Button className="mt-4 rounded-xl bg-indigo-600">Create Subject</Button>
+                    <Button className="mt-4 text-white rounded-xl bg-indigo-600 hover:text-black">Create Subject</Button>
                   </Link>
                 </div>
               ) : (

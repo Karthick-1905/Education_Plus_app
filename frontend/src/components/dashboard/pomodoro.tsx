@@ -17,14 +17,27 @@ function PomodoroTimerComponent() {
     const [startTime, setStartTime] = useState<Date | null>(null);
     const [mute, setMute] = useState(false);
     const [sessions, setSessions] = useState(0);
+    const [userSettings, setUserSettings] = useState<any>(null);
 
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     const config = {
-        study: { label: "Focus", time: 25 * 60, color: "text-indigo-600", bg: "bg-indigo-50", accent: "bg-indigo-600" },
-        "short-break": { label: "Quick Rest", time: 5 * 60, color: "text-indigo-600", bg: "bg-indigo-50", accent: "bg-indigo-600" },
-        "long-break": { label: "Long Rest", time: 15 * 60, color: "text-indigo-600", bg: "bg-indigo-50", accent: "bg-indigo-600" },
+        study: { label: "Focus", time: (userSettings?.pomodoroFocus || 25) * 60, color: "text-indigo-600", bg: "bg-indigo-50", accent: "bg-indigo-600" },
+        "short-break": { label: "Quick Rest", time: (userSettings?.pomodoroShortBreak || 5) * 60, color: "text-indigo-600", bg: "bg-indigo-50", accent: "bg-indigo-600" },
+        "long-break": { label: "Long Rest", time: (userSettings?.pomodoroLongBreak || 15) * 60, color: "text-indigo-600", bg: "bg-indigo-50", accent: "bg-indigo-600" },
     };
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            const { getSettings } = await import("@/actions/settings");
+            const res = await getSettings();
+            if (res.settings) {
+                setUserSettings(res.settings);
+                setTimeLeft(res.settings.pomodoroFocus * 60);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     useEffect(() => {
         if (isActive && !startTime) {

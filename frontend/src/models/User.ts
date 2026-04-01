@@ -6,6 +6,15 @@ export interface IAcademicDetails {
   stream?: string; // e.g., Science, Commerce
 }
 
+export interface IUserSettings {
+  pomodoroFocus: number;
+  pomodoroShortBreak: number;
+  pomodoroLongBreak: number;
+  aiSummaryLength: "short" | "medium" | "long";
+  theme: "light" | "dark" | "system";
+  notifications: boolean;
+}
+
 export interface IUser extends Document {
   name?: string;
   email: string;
@@ -16,6 +25,7 @@ export interface IUser extends Document {
   language?: string;
   isAnonymous: boolean;
   academicDetails?: IAcademicDetails;
+  settings: IUserSettings;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -38,6 +48,14 @@ const UserSchema = new Schema<IUser>(
       school: String,
       grade: String,
       stream: String,
+    },
+    settings: {
+      pomodoroFocus: { type: Number, default: 25 },
+      pomodoroShortBreak: { type: Number, default: 5 },
+      pomodoroLongBreak: { type: Number, default: 15 },
+      aiSummaryLength: { type: String, enum: ["short", "medium", "long"], default: "medium" },
+      theme: { type: String, enum: ["light", "dark", "system"], default: "system" },
+      notifications: { type: Boolean, default: true },
     },
   },
   { timestamps: true },
